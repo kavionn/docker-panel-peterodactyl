@@ -65,6 +65,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r2
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r3
+            ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r4
           cache-from: type=gha,scope=nodejs${{ matrix.node-version }}
           cache-to: type=gha,mode=max,scope=nodejs${{ matrix.node-version }}
           provenance: false
@@ -72,7 +73,7 @@ jobs:
 
       - name: Verify shared tools and startup helper
         run: |
-          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r3"
+          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r4"
           docker pull --platform linux/amd64 "$image"
           node_major="$(docker run --rm --platform linux/amd64 "$image" node --version | sed -E 's/^v([0-9]+).*/\1/')"
           test "$node_major" = "${{ matrix.node-version }}"
@@ -94,3 +95,13 @@ jobs:
             -e STARTUP_COMMAND=true \
             "$image" /usr/local/bin/ptero-startup
           test ! -e legacy-home/.ptero/startup.sh
+          test -s legacy-home/run.js
+          mkdir -p existing-runner-home
+          printf '%s\n' 'console.log("custom runner");' > existing-runner-home/run.js
+          chmod -R a+rwx existing-runner-home
+          docker run --rm --platform linux/amd64 \
+            -v "$PWD/existing-runner-home:/home/container" \
+            -e CLOUDFLARE_TUNNEL_ENABLED=0 \
+            -e STARTUP_COMMAND=true \
+            "$image" /usr/local/bin/ptero-startup
+          grep -qx 'console.log("custom runner");' existing-runner-home/run.js

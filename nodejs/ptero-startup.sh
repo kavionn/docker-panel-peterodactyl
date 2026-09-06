@@ -20,6 +20,50 @@ is_enabled() {
 if [[ -d .git ]] && is_enabled "${AUTO_UPDATE:-0}"; then
   git pull || echo "Git auto-update failed; using the current project files."
 fi
+create_default_runner() {
+  local runner_path="/home/container/run.js"
+
+  if [[ -e "$runner_path" ]]; then
+    if [[ ! -f "$runner_path" ]]; then
+      echo "$runner_path exists but is not a regular file; refusing to overwrite it."
+      return 1
+    fi
+    return 0
+  fi
+
+  if ! cat >"$runner_path" <<'NODE_RUNNER'
+import { spawn } from 'node:child_process';
+process.env.TZ = 'Asia/Jakarta';
+
+/**
+ * Function to start a command process.
+ * @param {string} cmd - The command to execute.
+ */
+function start(cmd) {
+   try {
+      const childProcess = spawn(cmd, [], {
+         stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+      });
+
+      childProcess.on('error', (error) => {
+         console.error('Error starting process:', error.message);
+      });
+   } catch (error) {
+      console.error('Error:', error.message);
+   }
+}
+
+start('bash');
+NODE_RUNNER
+  then
+    echo "Could not create $runner_path. Check the server file permissions."
+    return 1
+  fi
+
+  echo "Created $runner_path."
+}
+
+create_default_runner || exit 1
 
 if [[ -n "${NODE_PACKAGES:-}" ]]; then
   read -r -a node_packages <<<"${NODE_PACKAGES}"

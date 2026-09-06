@@ -18,7 +18,8 @@ yt-dlp zipimport binary is checksum-verified during every build, and Node.js is
 enabled as its JavaScript runtime for full YouTube support. Every image includes
 `/usr/local/bin/ptero-startup`, which handles the optional Cloudflare Tunnel
 and runs the egg's `STARTUP_COMMAND` without placing a startup helper in the
-server data volume.
+server data volume. On every start it recreates the default `run.js` when that
+file is missing, while preserving an existing custom `run.js`.
 
 Node.js 19 is a legacy compatibility image. Its only official base uses the
 now-EOL Debian Bullseye release, so the image pins the final signed Debian
@@ -30,7 +31,7 @@ Use one of these tags, replacing `<version>` with `18` through `26`:
 ```text
 ghcr.io/kavionn/panel:node_<version>
 ghcr.io/kavionn/panel:node_<version>-ytdlp-2026.08.19
-ghcr.io/kavionn/panel:node_<version>-ytdlp-2026.08.19-r3
+ghcr.io/kavionn/panel:node_<version>-ytdlp-2026.08.19-r4
 ```
 
 ## Image Registry
