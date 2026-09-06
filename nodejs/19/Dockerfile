@@ -9,9 +9,9 @@ ARG YT_DLP_SHA256=1fa6733c37ea6fb51c99ad8fe785e7b7e5f3246c9b980230329d4fb72ed8d4
 # Node 19 only has an official Bullseye image. Bullseye reached EOL on
 # 2026-08-31, so use the final Debian snapshots instead of moving mirrors.
 RUN printf '%s\n' \
-        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20260831T000000Z bullseye main' \
-        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/20260831T000000Z bullseye-updates main' \
-        'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian-security/20260831T000000Z bullseye-security main' \
+        'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20260831T000000Z bullseye main' \
+        'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20260831T000000Z bullseye-updates main' \
+        'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260831T000000Z bullseye-security main' \
         > /etc/apt/sources.list
 
 RUN useradd -m -d /home/container -s /bin/bash container
