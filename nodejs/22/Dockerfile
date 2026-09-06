@@ -18,6 +18,8 @@ RUN apt update \
         libsqlite3-dev \
         python3 \
         python3-dev \
+        python3-pip \
+        python3-venv \
         ca-certificates \
         dnsutils \
         tzdata \
@@ -101,7 +103,7 @@ RUN corepack enable
 RUN corepack prepare pnpm@latest --activate
 RUN corepack exec pnpm -- config set --global dangerouslyAllowAllBuilds true || true
 
-COPY --chmod=0755 nodejs/22/ptero-startup.sh /usr/local/bin/ptero-startup
+COPY --chmod=0755 nodejs/ptero-startup.sh /usr/local/bin/ptero-startup
 
 RUN mkdir -p /ms-playwright && chown -R container:container /ms-playwright
 

@@ -1,10 +1,10 @@
-name: Node.js 22 with yt-dlp
+name: Node.js 18-26 with shared tools
 
 on:
   push:
     branches: [ main, master ]
     paths:
-      - 'nodejs/22/**'
+      - 'nodejs/**'
       - '.github/workflows/nodejs.yml'
   workflow_dispatch:
 
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [22]
+        node-version: [18, 19, 20, 21, 22, 23, 24, 25, 26]
 
     steps:
       - name: Checkout repository
@@ -64,17 +64,22 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r2
+            ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r3
           cache-from: type=gha,scope=nodejs${{ matrix.node-version }}
           cache-to: type=gha,mode=max,scope=nodejs${{ matrix.node-version }}
           provenance: false
           sbom: false
 
-      - name: Verify yt-dlp in published image
+      - name: Verify shared tools and startup helper
         run: |
-          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r2"
+          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r3"
           docker pull --platform linux/amd64 "$image"
+          node_major="$(docker run --rm --platform linux/amd64 "$image" node --version | sed -E 's/^v([0-9]+).*/\1/')"
+          test "$node_major" = "${{ matrix.node-version }}"
           version="$(docker run --rm --platform linux/amd64 "$image" yt-dlp --ignore-config --version)"
           test "$version" = "2026.08.19"
+          docker run --rm --platform linux/amd64 "$image" sh -c \
+            'command -v python3 && command -v pip3 && command -v ffmpeg && command -v cloudflared'
           docker run --rm --platform linux/amd64 "$image" bash -n /usr/local/bin/ptero-startup
           docker run --rm --platform linux/amd64 \
             -e CLOUDFLARE_TUNNEL_ENABLED=0 \

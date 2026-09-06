@@ -10,22 +10,22 @@ This repository provides Docker images for Pterodactyl/Jexactyl eggs.
 
 This project only provides Docker images for eggs. You can build and maintain your own custom images and eggs if you prefer.
 
-## Kavionn Node.js 22 image
+## Kavionn Node.js images
 
-This fork publishes a Node.js 22 image for Pterodactyl with FFmpeg, Python,
-Chromium, cloudflared, and yt-dlp `2026.08.19`. The official yt-dlp zipimport
-binary is checksum-verified during the build, and Node.js is enabled as its
-JavaScript runtime for full YouTube support. The image also includes
+This fork publishes Node.js 18 through 26 images for Pterodactyl with FFmpeg,
+Python, pip, Chromium, cloudflared, and yt-dlp `2026.08.19`. The official
+yt-dlp zipimport binary is checksum-verified during every build, and Node.js is
+enabled as its JavaScript runtime for full YouTube support. Every image includes
 `/usr/local/bin/ptero-startup`, which handles the optional Cloudflare Tunnel
 and runs the egg's `STARTUP_COMMAND` without placing a startup helper in the
 server data volume.
 
-Use either of these tags:
+Use one of these tags, replacing `<version>` with `18` through `26`:
 
 ```text
-ghcr.io/kavionn/panel:node_22
-ghcr.io/kavionn/panel:node_22-ytdlp-2026.08.19
-ghcr.io/kavionn/panel:node_22-ytdlp-2026.08.19-r2
+ghcr.io/kavionn/panel:node_<version>
+ghcr.io/kavionn/panel:node_<version>-ytdlp-2026.08.19
+ghcr.io/kavionn/panel:node_<version>-ytdlp-2026.08.19-r3
 ```
 
 ## Image Registry

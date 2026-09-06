@@ -35,9 +35,16 @@ if [[ -f /home/container/package.json ]]; then
   /usr/local/bin/npm install
 fi
 
-if ! command -v yt-dlp >/dev/null 2>&1; then
+ensure_ytdlp() {
+  if command -v yt-dlp >/dev/null 2>&1; then
+    return 0
+  fi
+
   echo "yt-dlp is missing from the selected Docker image."
-fi
+  return 1
+}
+
+ensure_ytdlp || true
 
 start_cloudflare_tunnel() {
   local cloudflare_dir="/home/container/.cloudflare"

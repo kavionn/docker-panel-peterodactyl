@@ -1,5 +1,10 @@
 FROM        --platform=$TARGETOS/$TARGETARCH node:26.2-bookworm-slim
-LABEL author="siputzx" maintainer="custom@pterodactyl.io"
+LABEL author="siputzx" \
+      maintainer="kavionn" \
+      org.opencontainers.image.source="https://github.com/kavionn/docker-panel-peterodactyl"
+
+ARG YT_DLP_VERSION=2026.08.19
+ARG YT_DLP_SHA256=1fa6733c37ea6fb51c99ad8fe785e7b7e5f3246c9b980230329d4fb72ed8d4d6
 
 RUN useradd -m -d /home/container -s /bin/bash container
 STOPSIGNAL SIGINT
@@ -13,6 +18,8 @@ RUN apt update \
         libsqlite3-dev \
         python3 \
         python3-dev \
+        python3-pip \
+        python3-venv \
         ca-certificates \
         dnsutils \
         tzdata \
@@ -75,6 +82,14 @@ RUN mkdir -p --mode=0755 /usr/share/keyrings \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL \
+        "https://github.com/yt-dlp/yt-dlp/releases/download/${YT_DLP_VERSION}/yt-dlp" \
+        -o /usr/local/bin/yt-dlp \
+    && echo "${YT_DLP_SHA256}  /usr/local/bin/yt-dlp" | sha256sum --check --strict \
+    && chmod 0755 /usr/local/bin/yt-dlp \
+    && printf '%s\n' '--js-runtimes node' > /etc/yt-dlp.conf \
+    && test "$(yt-dlp --ignore-config --version)" = "${YT_DLP_VERSION}"
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_SKIP_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
@@ -87,6 +102,8 @@ RUN npm install -g corepack
 RUN corepack enable
 RUN corepack prepare pnpm@latest --activate
 RUN corepack exec pnpm -- config set --global dangerouslyAllowAllBuilds true || true
+
+COPY --chmod=0755 nodejs/ptero-startup.sh /usr/local/bin/ptero-startup
 
 RUN mkdir -p /ms-playwright && chown -R container:container /ms-playwright
 
