@@ -20,6 +20,11 @@ enabled as its JavaScript runtime for full YouTube support. Every image includes
 and runs the egg's `STARTUP_COMMAND` without placing a startup helper in the
 server data volume.
 
+Node.js 19 is a legacy compatibility image. Its only official base uses the
+now-EOL Debian Bullseye release, so the image pins the final signed Debian
+snapshots and uses yt-dlp's checksum-verified standalone Linux binaries because
+Bullseye's Python 3.9 is below yt-dlp's minimum supported Python version.
+
 Use one of these tags, replacing `<version>` with `18` through `26`:
 
 ```text

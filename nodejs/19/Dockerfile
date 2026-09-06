@@ -4,7 +4,9 @@ LABEL author="siputzx" \
       org.opencontainers.image.source="https://github.com/kavionn/docker-panel-peterodactyl"
 
 ARG YT_DLP_VERSION=2026.08.19
-ARG YT_DLP_SHA256=1fa6733c37ea6fb51c99ad8fe785e7b7e5f3246c9b980230329d4fb72ed8d4d6
+ARG TARGETARCH
+ARG YT_DLP_LINUX_AMD64_SHA256=58162f9bfdc27458ea47bfcb311cf47028f17d8154a8bf7d689861d46399230a
+ARG YT_DLP_LINUX_ARM64_SHA256=b16e4dab368a816cd05d477d698a605a6ae87ccee1c8ffd38fa21d7254141fcc
 
 # Node 19 only has an official Bullseye image. Bullseye reached EOL on
 # 2026-08-31, so use the final Debian snapshots instead of moving mirrors.
@@ -90,10 +92,15 @@ RUN mkdir -p --mode=0755 /usr/share/keyrings \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL \
-        "https://github.com/yt-dlp/yt-dlp/releases/download/${YT_DLP_VERSION}/yt-dlp" \
+RUN case "${TARGETARCH}" in \
+      amd64) YT_DLP_ASSET=yt-dlp_linux; YT_DLP_ASSET_SHA256="${YT_DLP_LINUX_AMD64_SHA256}" ;; \
+      arm64) YT_DLP_ASSET=yt-dlp_linux_aarch64; YT_DLP_ASSET_SHA256="${YT_DLP_LINUX_ARM64_SHA256}" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac \
+    && curl -fsSL \
+        "https://github.com/yt-dlp/yt-dlp/releases/download/${YT_DLP_VERSION}/${YT_DLP_ASSET}" \
         -o /usr/local/bin/yt-dlp \
-    && echo "${YT_DLP_SHA256}  /usr/local/bin/yt-dlp" | sha256sum --check --strict \
+    && echo "${YT_DLP_ASSET_SHA256}  /usr/local/bin/yt-dlp" | sha256sum --check --strict \
     && chmod 0755 /usr/local/bin/yt-dlp \
     && printf '%s\n' '--js-runtimes node' > /etc/yt-dlp.conf \
     && test "$(yt-dlp --ignore-config --version)" = "${YT_DLP_VERSION}"
