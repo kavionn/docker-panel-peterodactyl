@@ -25,6 +25,7 @@ Use either of these tags:
 ```text
 ghcr.io/kavionn/panel:node_22
 ghcr.io/kavionn/panel:node_22-ytdlp-2026.08.19
+ghcr.io/kavionn/panel:node_22-ytdlp-2026.08.19-r2
 ```
 
 ## Image Registry

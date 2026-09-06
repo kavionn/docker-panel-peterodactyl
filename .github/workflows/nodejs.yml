@@ -63,6 +63,7 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}
             ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19
+            ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r2
           cache-from: type=gha,scope=nodejs${{ matrix.node-version }}
           cache-to: type=gha,mode=max,scope=nodejs${{ matrix.node-version }}
           provenance: false
@@ -70,7 +71,7 @@ jobs:
 
       - name: Verify yt-dlp in published image
         run: |
-          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19"
+          image="ghcr.io/${{ github.repository_owner }}/panel:node_${{ matrix.node-version }}-ytdlp-2026.08.19-r2"
           docker pull --platform linux/amd64 "$image"
           version="$(docker run --rm --platform linux/amd64 "$image" yt-dlp --ignore-config --version)"
           test "$version" = "2026.08.19"
