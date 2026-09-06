@@ -101,6 +101,8 @@ RUN corepack enable
 RUN corepack prepare pnpm@latest --activate
 RUN corepack exec pnpm -- config set --global dangerouslyAllowAllBuilds true || true
 
+COPY --chmod=0755 nodejs/22/ptero-startup.sh /usr/local/bin/ptero-startup
+
 RUN mkdir -p /ms-playwright && chown -R container:container /ms-playwright
 
 USER container

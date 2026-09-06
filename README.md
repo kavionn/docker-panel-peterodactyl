@@ -15,7 +15,10 @@ This project only provides Docker images for eggs. You can build and maintain yo
 This fork publishes a Node.js 22 image for Pterodactyl with FFmpeg, Python,
 Chromium, cloudflared, and yt-dlp `2026.08.19`. The official yt-dlp zipimport
 binary is checksum-verified during the build, and Node.js is enabled as its
-JavaScript runtime for full YouTube support.
+JavaScript runtime for full YouTube support. The image also includes
+`/usr/local/bin/ptero-startup`, which handles the optional Cloudflare Tunnel
+and runs the egg's `STARTUP_COMMAND` without placing a startup helper in the
+server data volume.
 
 Use either of these tags:
 

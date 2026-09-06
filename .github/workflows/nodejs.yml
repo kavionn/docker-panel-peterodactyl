@@ -74,3 +74,17 @@ jobs:
           docker pull --platform linux/amd64 "$image"
           version="$(docker run --rm --platform linux/amd64 "$image" yt-dlp --ignore-config --version)"
           test "$version" = "2026.08.19"
+          docker run --rm --platform linux/amd64 "$image" bash -n /usr/local/bin/ptero-startup
+          docker run --rm --platform linux/amd64 \
+            -e CLOUDFLARE_TUNNEL_ENABLED=0 \
+            -e STARTUP_COMMAND='printf startup-helper-ok' \
+            "$image" /usr/local/bin/ptero-startup | grep -q 'startup-helper-ok'
+          mkdir -p legacy-home/.ptero
+          touch legacy-home/.ptero/startup.sh
+          chmod -R a+rwx legacy-home
+          docker run --rm --platform linux/amd64 \
+            -v "$PWD/legacy-home:/home/container" \
+            -e CLOUDFLARE_TUNNEL_ENABLED=0 \
+            -e STARTUP_COMMAND=true \
+            "$image" /usr/local/bin/ptero-startup
+          test ! -e legacy-home/.ptero/startup.sh
